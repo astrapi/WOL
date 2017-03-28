@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">WOL</string>
+    <string name="app_name">Wake On Lan</string>
+    <string name="nombre_equipo">Nombre del equipo</string>
+    <string name="texto_boton">Añadir Equipo</string>
+    <string name="mac">Mac del equipo</string>
 </resources>
