@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Wake On Lan</string>
-    <string name="nombre_equipo">Nombre del equipo</string>
-    <string name="texto_boton">Añadir Equipo</string>
+    <string name="nombre_equipo">Nombre equipo</string>
+    <string name="texto_boton_anadir">Añadir</string>
     <string name="mac">Mac del equipo</string>
     <string name="direccion_mac">00.00.00.00</string>
+    <string name="texto_boton_modificar">modificar</string>
 </resources>

@@ -8,19 +8,19 @@
         android:id="@+id/textViewListaEquipo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:paddingLeft="16dp"
         android:text=""
-        android:textColor="@android:color/holo_green_light"
+        android:textColor="@color/primary_text"
         android:textSize="24sp" />
 
     <TextView
         android:id="@+id/textViewListaMac"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:paddingLeft="16dp"
         android:text=""
-        android:textColor="@android:color/holo_green_light"
+        android:textColor="@color/secondary_text"
         android:textSize="14sp" />
 </LinearLayout>

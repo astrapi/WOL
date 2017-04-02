@@ -20,10 +20,10 @@
             android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
+            android:background="@color/primary"
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/nombre_equipo"
-            android:textColor="@android:color/holo_green_light"
+            android:textColor="@color/primary_text"
             android:textSize="18sp" />
 
         <EditText
@@ -34,7 +34,7 @@
             android:layout_weight="1"
             android:hint="@string/nombre_equipo"
             android:textAlignment="center"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 
@@ -51,10 +51,10 @@
             android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
+            android:background="@color/primary"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/mac"
-            android:textColor="@android:color/holo_green_light"
+            android:textColor="@color/primary_text"
             android:textSize="18sp"
             tools:layout_height="match_parent" />
 
@@ -101,7 +101,9 @@
             android:layout_weight="1"
             android:onClick="setItemEnLista"
             android:padding="8dp"
-            android:text="@string/texto_boton" />
+            android:backgroundTint="@color/primary"
+            android:textColor="@color/primary_text"
+            android:text="@string/texto_boton_anadir" />
     </LinearLayout>
 
 </LinearLayout>

@@ -5,32 +5,22 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.StrictMode;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.view.menu.ListMenuItemView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -39,10 +29,9 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
     ArrayList<String[]> listaDatos = new ArrayList<>();
     final String wol = "WOL";
     final static String PREFERENCIAS = "preferenciasWol";
-    final static String LONGITUD = "longitud";
-    final static String NOMBRE = "nombre";
-    final static String MAC = "mac";
     ListView lista;
+    boolean modificando = false;
+    int posicion = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +57,21 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
     private void guardarSharedPreferences(){
         SharedPreferences preferences = getSharedPreferences(PREFERENCIAS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor =  preferences.edit();
-        Set set = new HashSet<String>();
+        Set set = new HashSet<>();
         for(int i = 0; i < listaDatos.size(); i++){
             set.add(listaDatos.get(i)[0]+"-"+listaDatos.get(i)[1]);
         }
         editor.putStringSet("nombres", set);
-        editor.commit();
+        editor.apply();
     }
 
     private void cargarSharedPreferences(){
         SharedPreferences preferences = getSharedPreferences(PREFERENCIAS, Context.MODE_PRIVATE);
         Set<String> nombres = preferences.getStringSet("nombres", null);
         if(nombres != null) {
-            Iterator<String> i = nombres.iterator();
-            while (i.hasNext()){
-                StringTokenizer st = new StringTokenizer(i.next(), "-");
-                while(st.hasMoreTokens()){
+            for (String nombre : nombres) {
+                StringTokenizer st = new StringTokenizer(nombre, "-");
+                while (st.hasMoreTokens()) {
                     String[] dato = new String[2];
                     dato[0] = st.nextToken();
                     dato[1] = st.nextToken();
@@ -101,12 +89,27 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
     public void setItemEnLista(View view){
         EditText nombre = (EditText)findViewById(R.id.editTextNombre);
         EditText mac = (EditText)findViewById(R.id.editTextMac);
+        if(nombre.length() == 0 || mac.length() == 0){
+            mensajeToast("No se puede dejar ningún dato vacio");
+            nombre.requestFocus();
+            return;
+        }
         String[] nuevoDato = {nombre.getText().toString(), mac.getText().toString()};
-        listaDatos.add(nuevoDato);
+        if(modificando){
+            listaDatos.set(posicion, nuevoDato);
+            Button boton = (Button)findViewById(R.id.boton);
+            boton.setText(R.string.texto_boton_anadir);
+            modificando = false;
+            Log.i(wol, "Modificado un equipo de la lista.");
+        }
+        else{
+            listaDatos.add(nuevoDato);
+            Log.i(wol, "Añadido un nuevo equipo a la lista.");
+        }
+
         AdaptadorListaEquipos adaptadorListaEquipos = new AdaptadorListaEquipos
                 (this, R.layout.layout_elemento_lista, R.id.textViewListaEquipo, listaDatos);
         lista.setAdapter(adaptadorListaEquipos);
-        Log.i(wol, "Añadido un nuevo equipo a la lista.");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
@@ -116,13 +119,20 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
     }
 
     private byte getByte(String dato){
-        short s = Short.parseShort(dato, 16);
-        byte b = (byte)s;
+        byte b = 0x00;
+        try{
+            short s = Short.parseShort(dato, 16);
+            b = (byte)s;
+        }
+        catch (NumberFormatException ne){
+            Log.i(wol, ne.toString());
+        }
         return b;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int posicion, long id) {
+        this.posicion = posicion;
         despertarOrdenador(posicion);
     }
 
@@ -153,10 +163,20 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
     }
 
     private void modificarEquipo(int posicion, DialogInterface dialogo){
+        modificando = true;
+        String nombre = listaDatos.get(posicion)[0];
+        String mac = listaDatos.get(posicion)[1];
+        Button boton = (Button)findViewById(R.id.boton);
+        boton.setText(R.string.texto_boton_modificar);
+        EditText et_nombre = (EditText) findViewById(R.id.editTextNombre);
+        et_nombre.setText(nombre);
+        EditText et_mac = (EditText) findViewById(R.id.editTextMac);
+        et_mac.setText(mac);
+        et_nombre.requestFocus();
         dialogo.cancel();
     }
 
-    private void mensaje(String mensaje){
+    private void mensajeToast(String mensaje){
         Toast toast = Toast.makeText(this, mensaje, Toast.LENGTH_LONG);
         toast.show();
     }
@@ -171,7 +191,7 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
 
         @Override
         protected String doInBackground(Integer... posicion) {
-            Log.i(wol, "Crea AsyncTask");
+            Log.i(wol, "Crea clase AsyncTask TareaDespertarOrdenador");
             int pos = posicion[0].intValue();
             String[] datos = listaDatos.get(pos);
             String macString = datos[1];
@@ -181,9 +201,9 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
             while(st.hasMoreTokens()){
                 mac[i++] = getByte(st.nextToken());
             }
-            for(int j = 0; j < mac.length; j++){
-                Log.i(wol, String.valueOf(mac[j]));
-            }
+
+            Log.i(wol, "MAC del equipo a despertar: " + macString);
+
             byte[] buffer = new byte[102];
             byte contador;
             for (contador = 0; contador < 6; contador++) {
@@ -197,7 +217,6 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
                 udp.setBroadcast(true);
                 udp.send(new DatagramPacket
                         (buffer, 102, InetAddress.getByName("255.255.255.255"), 1976));
-                Log.i(wol, "enviado datagrama Magic Packet.");
             } catch (java.net.SocketException se) {
                 System.out.println(se.toString());
 
@@ -207,15 +226,13 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
             } catch (java.io.IOException ie) {
                 System.out.println(ie.toString());
             }
-            return "acaba doInBackground";
+            return "Enviado datagrama magic packet";
         }
 
         @Override
         protected void onPostExecute(String mensaje){
             Log.i(wol, mensaje);
-            mensaje(mensaje);
+            mensajeToast(mensaje);
         }
     }
-
-
 }
