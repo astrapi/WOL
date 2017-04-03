@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -52,6 +53,17 @@ public class WakeOnLan extends AppCompatActivity implements AdapterView.OnItemCl
         super.onPause();
         guardarSharedPreferences();
         Log.i(wol, "Guarda preferencias.");
+    }
+
+    public void urkell(View view){
+        Log.i(wol, "Muestra a Steve Urkel ;-))");
+        LayoutInflater li = getLayoutInflater();
+        View layout = li.inflate(R.layout.layout_urkel,null);
+        Toast t = new Toast(getApplicationContext());
+        t.setView(layout);
+        t.setDuration(Toast.LENGTH_LONG);
+        t.show();
+
     }
 
     private void guardarSharedPreferences(){

@@ -22,6 +22,7 @@
             android:layout_weight="1"
             android:background="@color/primary"
             android:gravity="center_horizontal|center_vertical"
+            android:onClick="urkell"
             android:text="@string/nombre_equipo"
             android:textColor="@color/primary_text"
             android:textSize="18sp" />
@@ -61,7 +62,7 @@
         <EditText
             android:id="@+id/editTextMac"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:layout_weight="1"
             android:hint="@string/direccion_mac"
